@@ -30,7 +30,8 @@ view: affinity_movies_cast_crew {
     ;;
 
     datagroup_trigger: won_thesis_movies_default_datagroup
-    indexes: ["movies_id", "movies_release_date"]
+#     indexes: ["movies_id", "movies_release_date"]
+
 
 
   }

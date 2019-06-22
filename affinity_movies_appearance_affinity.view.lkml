@@ -1,6 +1,6 @@
 view: affinity_movies_appearance_affinity {
   derived_table: {
-    indexes: ["cast_a"]
+    #indexes: ["cast_a"]
     sql:
       WITH movie_id_getter AS
             (SELECT mc1.names_name AS cast_a,
@@ -99,7 +99,7 @@ view: affinity_movies_appearance_affinity {
   measure: joint_movie_count {
     description: "How many times cast A and B were in the same movie"
     type: count
-    sql: ${TABLE}.joint_movie_count ;;
+#     sql: ${TABLE}.joint_movie_count ;;
     value_format: "#"
     drill_fields: [movie_title, movie_release_year, movie_poster]
   }
