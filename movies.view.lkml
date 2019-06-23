@@ -23,6 +23,7 @@ view: movies {
   dimension: budget {
     type: number
     sql: ${TABLE}.budget ;;
+    value_format_name: usd_0
   }
 
   # [{'id': 27, 'name': 'Horror'}, {'id': 53, 'name': 'Thriller'}, {'id': 878, 'name': 'Science Fiction'}
@@ -106,6 +107,7 @@ view: movies {
   dimension: revenue {
     type: number
     sql: ${TABLE}.revenue ;;
+    value_format_name:usd_0
   }
 
   measure: revenue_sum {
