@@ -118,6 +118,7 @@ view: movies {
   dimension: revenue_minus_budget {
     type: number
     sql: ${TABLE}.revenue - ${TABLE}.budget ;;
+    value_format_name: usd_0
   }
 
   dimension: runtime {
