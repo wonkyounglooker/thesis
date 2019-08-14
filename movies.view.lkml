@@ -74,8 +74,8 @@ view: movies {
 
   dimension: movies_poster {
     sql:  ${TABLE}.poster_path ;;
-    html:
-    <img src="http://image.tmdb.org/t/p/w185/{{ value }}" /> ;;
+#     html: <img src="http://image.tmdb.org/t/p/w185/{{ value }}" /> ;;
+    html: <img src="http://image.tmdb.org/t/p/w185/{{ value }}" height=250/> ;;
   }
 
   dimension: production_companies {
@@ -102,6 +102,11 @@ view: movies {
     convert_tz: no
     datatype: date
     sql: ${TABLE}.release_date ;;
+  }
+
+  dimension: latest_data_only{
+    type: yesno
+    sql: ${release_date} = current_date() ;;
   }
 
   dimension: revenue {
