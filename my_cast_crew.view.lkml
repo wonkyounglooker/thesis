@@ -8,6 +8,8 @@ view: my_cast_crew {
   derived_table: {
     sql:SELECT SLEEP (40),
     1 as "one";;
+
+    sql_trigger_value: SELECT MINUTE(CURTIME());;
   }
   dimension: one {}
   #
