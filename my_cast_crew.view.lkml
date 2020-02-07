@@ -9,7 +9,7 @@ view: my_cast_crew {
     sql:SELECT SLEEP (40),
     1 as "one";;
 
-    sql_trigger_value: SELECT MINUTE(CURTIME());;
+    sql_trigger_value: SELECT HOUR(CURTIME());;
   }
   dimension: one {}
   #
