@@ -1,5 +1,5 @@
 connection: "sam_mysql"
-include: "*.view"
+include: "my_cast_crew.view"
 
 explore: my_cast_crew {}
 
