@@ -28,4 +28,5 @@ view: genres {
     type: count
     drill_fields: [id, movies.id]
   }
+
 }

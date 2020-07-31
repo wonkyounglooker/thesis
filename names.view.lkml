@@ -47,6 +47,7 @@ view: names {
     END;;
   }
 
+
 #   dimension: imdb_person_image {
 #     type: string
 #     sql: ${TABLE}.nconst;;

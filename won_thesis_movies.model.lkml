@@ -5,10 +5,12 @@ include: "*.view"
 
 datagroup: won_thesis_movies_default_datagroup {
   sql_trigger: SELECT CURDATE() ;;
-  max_cache_age: "1 hour"
+  max_cache_age: "43800 minutes"
 }
+fiscal_month_offset: -11
 
 persist_with: won_thesis_movies_default_datagroup
+
 
 explore: affinity_movies_appearance_affinity {
   label: "Affinity"
@@ -20,13 +22,30 @@ explore: affinity_movies_appearance_affinity {
   }
 }
 
-explore: movies {
+explore: countries {
   always_filter: {
-    filters: {
-      field: imdb_ratings.num_votes
-      value: ">=5000"
-    }
+    filters: [countries.country: "{{ _user_attributes['state'] }}"]
   }
+# always_filter:
+# {filters: {field: dim_organization.council_code value: "{{ _user_attributes['council_code'] }}"}}
+}
+
+explore: movies {
+#   sql_always_where:
+#   {% condition movies.won_templated_filter %} movies.release_date {% endcondition %} ;;
+#   sql_always_where:
+#    {% if movies.won_date_parameter._parameter_value == "last week" %}
+#       {% parameter movies.won_date_parameter %} = "'last week'"
+#       {% else %}
+#    1=1
+# {% endif %};;
+
+# sql_always_where:
+#   {% if movies.won_date_parameter._parameter_value == "'last week'" %}
+#   ${movies.release_date} > DATE(timestamp_sub(current_timestamp, INTERVAL 7 DAY))
+#   {% else %}
+#   1=1
+#   {% endif %};;
 
   join: keywords_clean {
     sql_on: ${movies.id} = ${keywords_clean.movieid} ;;
@@ -39,7 +58,12 @@ explore: movies {
     type: left_outer
   }
   join: genres {
-    sql_on: ${movies.id} = ${genres.movieid};;
+    sql_on: ${movies.id} = ${genres.movieid} AND
+    {% if movies.won_string_parameter._is_filtered %}
+    ${genres.genre} = {% parameter movies.won_string_parameter %}
+    {% else %}
+    1=1
+    {% endif %};;
     relationship: one_to_many
     type:  left_outer
   }
@@ -96,12 +120,12 @@ explore: movies {
 explore: names {
   label: "People"
 
-#   always_filter: {
-#     filters: {
-#       field: imdb_ratings.num_votes
-#       value: ">=5000"
-#     }
-#   }
+  always_filter: {
+    filters: {
+      field: imdb_ratings.num_votes
+      value: ">=5000"
+    }
+  }
 
   join: cast_crew {
     sql_on: ${names.nconst} = ${cast_crew.nconst} ;;
@@ -155,4 +179,5 @@ explore: names {
     relationship: one_to_many
     type:  left_outer
   }
+
 }
