@@ -436,11 +436,6 @@ measure: dummy_measure {
     }
   }
 
-  # measure: won_coalesce_test {
-  #   type: sum
-  #   sql: coalesce(${sum_popularity}, ${won_count}) ;;
-  # }
-
 measure: yesno {
   type: yesno
   sql: ${sum_popularity}>50 OR ${count_movies}>100  ;;
