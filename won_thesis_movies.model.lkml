@@ -26,6 +26,8 @@ explore: countries {
   always_filter: {
     filters: [countries.country: "{{ _user_attributes['state'] }}"]
   }
+
+
 # always_filter:
 # {filters: {field: dim_organization.council_code value: "{{ _user_attributes['council_code'] }}"}}
 }
@@ -120,11 +122,18 @@ explore: movies {
 explore: names {
   label: "People"
 
+
   always_filter: {
     filters: {
       field: imdb_ratings.num_votes
       value: ">=5000"
     }
+  }
+  query: status_by_month {
+    dimensions: [
+      genres.genre]
+    measures: [movies.count_movies]
+    label: "Won_Query_Test"
   }
 
   join: cast_crew {
