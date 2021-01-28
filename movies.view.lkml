@@ -1,9 +1,8 @@
 view: movies {
-#   sql_table_name: mak_movies.movies ;;
-derived_table: {
-  sql: SELECT * FROM mak_movies.movies ;;
-}
-
+  sql_table_name: mak_movies.movies ;;
+# derived_table: {
+#   sql: SELECT * FROM mak_movies.movies ;;
+# }
 
 # parameter: won_date_parameter {
 #   type: string
@@ -118,7 +117,7 @@ link: {
     type: string
     sql: ${TABLE}.original_title ;;
     case_sensitive: no
-    hidden: yes
+    order_by_field: loss_rank.loss_rank
   }
 
   dimension: overview {
@@ -229,6 +228,32 @@ link: {
     sql: ${TABLE}.release_date ;;
   }
 
+# convert start day of the week to a Satruday - Sunday model, because this is the CCC team payroll cycle
+  dimension: ticket_creation_payroll_week {
+    label: "Created Week"
+    # description: "Payroll week with a start date on Sunday"
+    group_label: "Payroll Week"
+    type: date
+    datatype: date
+    convert_tz: no
+    sql: case when ${release_day_of_week} = 'Sunday' then ${release_date}
+            when ${release_day_of_week} = 'Monday' then DATE_SUB(${release_date}, interval 1 day)
+            when ${release_day_of_week} = 'Tuesday' then DATE_SUB(${release_date}, interval 2 day)
+            when ${release_day_of_week} = 'Wednesday' then DATE_SUB(${release_date}, interval 3 day)
+            when ${release_day_of_week} = 'Thursday' then DATE_SUB(${release_date}, interval 4 day)
+            when ${release_day_of_week} = 'Friday' then DATE_SUB(${release_date}, interval 5 day)
+            when ${release_day_of_week} = 'Saturday' then DATE_SUB(${release_date}, interval 6 day)
+        end;;
+    # sql: case when ${release_day_of_week} = 'Sunday' then ${release_date}
+    #         when ${release_day_of_week} = 'Monday' then ${release_date} - interval '1 day'
+    #         when ${release_day_of_week} = 'Tuesday' then ${release_date} - interval '2 day'
+    #         when ${release_day_of_week} = 'Wednesday' then ${release_date} - interval '3 day'
+    #         when ${release_day_of_week} = 'Thursday' then ${release_date} - interval '4 day'
+    #         when ${release_day_of_week} = 'Friday' then ${release_date} - interval '5 day'
+    #         when ${release_day_of_week} = 'Saturday' then ${release_date} - interval '6 day'
+    #     end;;
+  }
+
   dimension: test_hour_of_day {
 #     type: date_hour_of_day
     sql: ${release_hour_of_day} ;;
@@ -292,6 +317,7 @@ dimension: currency_parameter_value {
 
   dimension: revenue {
     type: number
+    label: "test"
      sql: ${TABLE}.revenue ;;
 
   }
@@ -428,12 +454,19 @@ measure: dummy_measure {
   measure: sum_popularity {
     type: sum
     sql: ${TABLE}.popularity ;;
+    # html:
+    # {% if _user_attributes['favorite_state'] == "california" %}
+    #   <a href="https://dcl.dev.looker.com/explore/won_thesis_movies/movies?fields=movies.title,movies.release_year,movies.movies_poster, movies.sum_popularity&f[genres.genre]={{ genres.genre._value }}&f[movies.release_year]={{ movies.release_year._value }}&f[imdb_ratings.num_votes]=>=5000&sorts=movies.sum_popularity desc"</a>
+    # {% else %}
+    #   <a href="https://dcl.dev.looker.com/explore/won_thesis_movies/movies?fields=release_year,movies.movies_poster, movies.sum_popularity&f[genres.genre]={{ genres.genre._value }}&f[movies.release_year]={{ movies.release_year._value }}&f[imdb_ratings.num_votes]=>=5000&sorts=movies.sum_popularity desc"</a>
+    # {% endif %} ;;
+
     link: {
       label: "Drill Into Movies"
-      url: "https://dcl.dev.looker.com/explore/won_thesis_movies/movies?fields=movies.title,movies.release_year,movies.movies_poster, movies.sum_popularity&f[genres.genre]={{ genres.genre._value }}&f[movies.release_year]={{ movies.release_year._value }}&f[imdb_ratings.num_votes]=>=5000&sorts=movies.sum_popularity desc&limit=500&query_timezone=America/New_York"
+      url: "https://dcl.dev.looker.com/{{ _user_attributes['favorite_state'] }}?Genre={{ genres.genre._value | url_encode }}"
       # url: "/dashboards/285?{{ 'Test%' | url_encode }}={{ 4 | url_encode }}"
 
-    }
+     }
   }
 
 measure: yesno {
@@ -446,6 +479,7 @@ measure: max_drill_test {
   sql:  ${revenue} ;;
   drill_fields: [genres.id]
 }
+
 
   # ----- Sets of fields for drilling ------
   set: detail {

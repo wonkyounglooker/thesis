@@ -13,6 +13,16 @@ view: genres {
     case_sensitive: no
   }
 
+  dimension: test_dimension {
+    type: string
+    sql: coalesce(${TABLE}.genre, "Not applicable") ;;
+  }
+
+measure: genre_list {
+  type: list
+  list_field: genre
+}
+
   filter: genre_selector {
     type: string
   }
@@ -27,6 +37,8 @@ view: genres {
   measure: genres_count {
     type: count
     drill_fields: [id, movies.id]
+    value_format_name: "usd"
+    html: <a href="{{link}}">{{ rendered_value }}</a> ;;
   }
 
 }

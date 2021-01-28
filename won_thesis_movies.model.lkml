@@ -1,7 +1,7 @@
 connection: "lookerdata_standard_sql"
-
 # include all the views
 include: "*.view"
+include: "*.dashboard"
 
 datagroup: won_thesis_movies_default_datagroup {
   sql_trigger: SELECT CURDATE() ;;
@@ -10,7 +10,6 @@ datagroup: won_thesis_movies_default_datagroup {
 fiscal_month_offset: -11
 
 persist_with: won_thesis_movies_default_datagroup
-
 
 explore: affinity_movies_appearance_affinity {
   label: "Affinity"
