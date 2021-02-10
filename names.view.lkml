@@ -56,7 +56,9 @@ view: names {
     END;;
   }
 
-
+  dimension: field_from_movies {
+    sql: ${movies.title} ;;
+  }
 #   dimension: imdb_person_image {
 #     type: string
 #     sql: ${TABLE}.nconst;;

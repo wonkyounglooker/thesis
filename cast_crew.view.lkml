@@ -44,6 +44,9 @@ view: cast_crew {
     sql: ${TABLE}.tconst ;;
   }
 
+  dimension: test_movies {
+    sql: ${movies.title} ;;
+  }
 
   measure: count {
     type: count

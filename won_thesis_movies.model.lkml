@@ -128,12 +128,12 @@ explore: names {
       value: ">=5000"
     }
   }
-  query: status_by_month {
-    dimensions: [
-      genres.genre]
-    measures: [movies.count_movies]
-    label: "Won_Query_Test"
-  }
+  # query: status_by_month {
+  #   dimensions: [
+  #     genres.genre]
+  #   measures: [movies.count_movies]
+  #   label: "Won_Query_Test"
+  # }
 
   join: cast_crew {
     sql_on: ${names.nconst} = ${cast_crew.nconst} ;;
@@ -148,6 +148,7 @@ explore: names {
   }
 
   join: movies {
+    fields: []
     sql_on: ${movies.imdbid} = ${crew_ids.tconst} ;;
     relationship: one_to_many
     type:  left_outer
