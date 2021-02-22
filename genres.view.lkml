@@ -15,6 +15,16 @@ view: genres {
     case_sensitive: no
   }
 
+  dimension: test_dimension {
+    type: string
+    sql: coalesce(${TABLE}.genre, "Not applicable") ;;
+  }
+
+measure: genre_list {
+  type: list
+  list_field: genre
+}
+
   filter: genre_selector {
     type: string
   }
@@ -31,8 +41,11 @@ view: genres {
 
     type: count
     drill_fields: [id, movies.id]
+    value_format_name: "usd"
+    html: <a href="{{link}}">{{ rendered_value }}</a> ;;
   }
 
+<<<<<<< HEAD
   measure: movied_count {
     type: count_distinct
     sql: ${movieid} ;;
@@ -43,4 +56,6 @@ view: genres {
     sql: CASE WHEN (${genres_count}/${movied_count}) >2 then 'yes'
     ELSE null END;;
   }
+=======
+>>>>>>> branch 'master' of git@github.com:wonkyounglooker/thesis.git
 }

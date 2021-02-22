@@ -1,6 +1,15 @@
 view: names {
   sql_table_name: mak_movies.names ;;
 
+ dimension: test_date {
+  # sql: ${movies.release_date};;
+  sql:  SELECT
+                                -- subscribers_converted_from_free_to_paid_period.subscriber_payment_type,
+                                --TO_CHAR(DATE_TRUNC('day', subscribers_converted_from_free_to_paid_period.date_ts_from),'YYYY-MM-DD') AS transaction_day,
+                                ${movies.release_date} AS test_date
+                              FROM ${movies.SQL_TABLE_NAME} AS movies_view;;
+ }
+
   dimension: birth_year {
     type: string
     sql: ${TABLE}.birth_year ;;
@@ -47,6 +56,9 @@ view: names {
     END;;
   }
 
+  dimension: field_from_movies {
+    sql: ${movies.title} ;;
+  }
 #   dimension: imdb_person_image {
 #     type: string
 #     sql: ${TABLE}.nconst;;
