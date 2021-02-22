@@ -20,9 +20,19 @@ view: movies {
     sql: ${TABLE}.belongs_to_collection ;;
   }
 
+parameter: number_filter {
+  type: number
+  default_value: "5"
+}
   dimension: budget {
     type: number
     sql: ${TABLE}.budget ;;
+    value_format_name: usd_0
+  }
+
+  dimension: multiplied_budget {
+    type: number
+    sql: (${TABLE}.budget) *  {{ number_filter._parameter_value }} ;;
     value_format_name: usd_0
   }
 
@@ -63,6 +73,7 @@ view: movies {
   }
 
   dimension: popularity {
+    label: "popularity very long title (test to see if its cutoff)"
     type: number
     sql: ${TABLE}.popularity ;;
   }
@@ -113,6 +124,17 @@ view: movies {
     type: number
     sql: ${TABLE}.revenue ;;
     value_format_name:usd_0
+
+  }
+
+  measure: max_test {
+    type: max
+    sql: ${revenue} ;;
+  }
+
+  measure: dynamic_revenue_tier {
+    type: number
+    sql: TRUNC(${revenue}/${max_test},0) *${max_test} ;;
   }
 
   measure: revenue_sum {

@@ -25,6 +25,10 @@ view: cast_crew {
   dimension: job {
     type: string
     sql: ${TABLE}.job ;;
+    link: {
+      label: "Drill Dashboard"
+    url:"/dashboards-next/1076?Age={{ _filters['names.age'] | url_encode }}"
+    }
   }
 
   dimension: nconst {

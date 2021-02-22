@@ -1,6 +1,10 @@
 view: writers {
   sql_table_name: mak_movies.writers ;;
 
+  set: exclude {
+    fields: [writer_id,birth_year]
+  }
+
   dimension: writer_id {
     primary_key: yes
     type: string
