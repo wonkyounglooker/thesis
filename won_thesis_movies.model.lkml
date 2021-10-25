@@ -3,6 +3,11 @@ connection: "lookerdata_standard_sql"
 include: "*.view"
 include: "*.dashboard"
 
+# access_grant: won_access_test {
+#   user_attribute: won_dynamic_model
+#   allowed_values: ["nothing"]
+# }
+
 datagroup: won_thesis_movies_default_datagroup {
   sql_trigger: SELECT CURDATE() ;;
   max_cache_age: "43800 minutes"
@@ -21,18 +26,13 @@ explore: affinity_movies_appearance_affinity {
   }
 }
 
-explore: countries {
-  always_filter: {
-    filters: [countries.country: "{{ _user_attributes['state'] }}"]
-  }
-
-
-# always_filter:
-# {filters: {field: dim_organization.council_code value: "{{ _user_attributes['council_code'] }}"}}
+explore: keywords {
 }
 
+
 explore: movies {
-#   sql_always_where:
+  sql_always_where: 1=1 ;;
+  #   sql_always_where:
 #   {% condition movies.won_templated_filter %} movies.release_date {% endcondition %} ;;
 #   sql_always_where:
 #    {% if movies.won_date_parameter._parameter_value == "last week" %}

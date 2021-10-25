@@ -34,4 +34,18 @@ view: revenue_rank {
     type: number
     sql:  ${TABLE}.rank ;;
   }
+
+  measure: min_rank {
+    type: min
+    sql: ${revenue_rank} ;;
+  }
+  dimension: top_10_movie {
+    type: yesno
+    sql: ${revenue_rank} <= 10;;
+  }
+
+  dimension: top_movie_titles {
+    sql:  CASE WHEN ${top_10_movie} then ${title} else 'Other' end ;;
+    order_by_field: min_rank
+  }
 }

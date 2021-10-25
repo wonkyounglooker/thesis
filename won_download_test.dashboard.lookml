@@ -1,12 +1,13 @@
-- dashboard: download_test
-  title: download test
+- dashboard: won_download_test
+  title: won_download test
   layout: newspaper
-  preferred_viewer: dashboards-next
+  # preferred_viewer: dashboards-next
+  preferred_viewer: dashboards
+  filters_bar_collapsed: false
   elements:
   - title: New Tile
     name: New Tile
-#     model: won_thesis_movies
-    model: "@{won_model}"
+    model: won_thesis_movies
     explore: movies
     type: looker_column
     fields: [names.name, movies.count_movies]
@@ -52,3 +53,10 @@
     col:
     width:
     height:
+  filters:
+  - name: Genre
+    title: Genre
+    type: field_filter
+    model: won_thesis_movies
+    explore: movies
+    field: genres.genre
