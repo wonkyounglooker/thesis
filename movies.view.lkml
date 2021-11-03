@@ -304,13 +304,12 @@ measure: referencing_access_grant_dimension {
     sql: {% date_end release_date %} ;;
   }
 
-  parameter: timeframe_picker {
+  parameter: timeframe_picker_test {
     label: "Date Granularity"
     type: string
-    allowed_value: { value: "Date" }
-    allowed_value: { value: "Week" }
-    allowed_value: { value: "Month" }
-    default_value: "Date"
+    allowed_value: { label: "Date test" value: "Date" }
+    allowed_value: { label: "Week" value: "Week" }
+    allowed_value: { label: "Month" value: "Month" }
   }
 
   parameter: genre_random {
