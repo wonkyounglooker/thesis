@@ -8,6 +8,9 @@ view: genres {
   }
 
   dimension: genre {
+    label: "Girl Grade"
+    view_label: "Membership"
+    group_label: "Member Segmentation"
     type: string
     sql: ${TABLE}.genre ;;
     case_sensitive: no
