@@ -1,7 +1,8 @@
 view: movies {
   sql_table_name: mak_movies.movies ;;
 # derived_table: {
-#   sql: SELECT * FROM mak_movies.movies ;;
+#   sql: SELECT * FROM mak_movies.movies
+#   WHERE EXTRACT(YEAR FROM release_date) = {% parameter liquid_parameter_test %};;
 # }
 
 # parameter: won_date_parameter {
@@ -11,14 +12,16 @@ view: movies {
 #     value: "last week"
 #   }
 # }
-
-parameter: won_date_parameter {
-  type: date
+dimension: dimensionalized_count {
 }
 
 
 filter: won_num_filter {
   type: number
+}
+
+filter: string_filter {
+  type: string
 }
 
 dimension: get_filter_value {
@@ -29,6 +32,7 @@ dimension: get_filter_value {
 parameter: won_string_parameter {
   type: string
   suggest_dimension: genres.genre
+  suggest_explore: names
 }
 
 filter: won_templated_filter {
@@ -36,30 +40,37 @@ filter: won_templated_filter {
   datatype: date
 }
 
+parameter: liquid_parameter_test {
+  type: number
+}
+
 dimension: date_diff {
   sql: DATE_DIFF(${release_date}, CAST({% date_start won_templated_filter %} AS DATE), day) ;;
 }
 
-dimension: liquid_test {
+dimension: access_grant_dimension {
   type: string
+  # required_access_grants: [won_access_test]
   sql: ${imdbid} ;;
-#   html:
-#   <div align="center">{{rendered_value}}</div>
-#
-#       {% if imdb_ratings.avg_rating._value > 5000 %}<div align="center">
-#         <b>FOUNDATIONS PORTFOLIO</b></div>
-#       {% else %}<div align="center"><b>GRADUATION PORTFOLIO</b></div>
-#       {% endif %}
-#       <div align="center">{{ imdb_ratings.tconst._value }}</div>
-#
-#       <div align="center">Growth - {{ imdb_ratings.num_votes._value }}</div>
-#        <div align="center">Performance Level - {{ imdb_ratings.avg_rating._value }}</div>;;
-link: {
-  label: "won Look url test"
-#   Looker 1776 doesn't have a filter set on the genres.genre field. We can still pass it in the URL
-  url: "https://dcl.dev.looker.com/looks/1776?&f[genres.genre]=Drama"
+  html:
+   {% if won_templated_filter._is_filtered %}
+      {% if won_string_parameter._parameter_value == "Drama"  %}
+        "some value"
+      {% endif %}
+   {% elsif get_filter_value._is_filtered %}
+      {% if won_string_parameter._parameter_value == "Western" %}
+          "some other value"
+      {% endif %}
+    {% else %}
+      "else case"
+    {% endif %} ;;
 }
+
+measure: referencing_access_grant_dimension {
+  type: sum
+  sql: ${budget} ;;
 }
+
 
   dimension: id {
     primary_key: yes
@@ -77,7 +88,35 @@ link: {
 
   dimension: belongs_to_collection {
     type: string
-    sql: ${TABLE}.belongs_to_collection ;;
+    # sql: ${TABLE}.belongs_to_collection ;;
+    sql:
+'<p class=MsoNormal><o:p>&nbsp;'    ;;
+# html: {{ value | strip_html }} ;;
+    html: {% assign words =  value | escape | replace: "&lt;", "µ" |  replace: "&gt;", "µ" | split: 'µ'  %}
+
+    {% assign i = 0 %}
+
+    {% for word in words %}
+
+    {% assign m = i | modulo: 2 %}
+
+    {% if m == 0 %}
+
+    {{ word }}
+
+    {% endif %}
+
+    {% assign i = i | plus: 1 %}
+
+    {% endfor %}
+
+    ;;
+  }
+
+  dimension: belongs_to_collection_second {
+    type:  string
+    sql: ${belongs_to_collection} ;;
+    html: {{ value | replace: "&nbsp:", " " }} ;;
   }
 
   dimension: budget {
@@ -221,6 +260,7 @@ link: {
       year,
       day_of_week,
       hour_of_day,
+      hour,
       week_of_year
     ]
 #     convert_tz: no
@@ -264,22 +304,12 @@ link: {
     sql: {% date_end release_date %} ;;
   }
 
-  parameter: timeframe_picker {
+  parameter: timeframe_picker_test {
     label: "Date Granularity"
     type: string
-    allowed_value: { value: "Date" }
-    allowed_value: { value: "Week" }
-    allowed_value: { value: "Month" }
-    default_value: "Date"
-  }
-
-  dimension: dynamic_timeframe {
-    type: string
-    sql:
-    CASE
-    WHEN {% parameter timeframe_picker %} = 'Week' THEN ${movies.release_week}
-    WHEN{% parameter timeframe_picker %} = 'Month' THEN ${movies.release_month}
-    END ;;
+    allowed_value: { label: "Date test" value: "Date" }
+    allowed_value: { label: "Week" value: "Week" }
+    allowed_value: { label: "Month" value: "Month" }
   }
 
   parameter: genre_random {
@@ -331,25 +361,20 @@ measure: won_test_measure {
     type: number
     sql: TRUNC(${TABLE}.revenue / (max(${TABLE}.revenue)*0.1), 0) * (max(${TABLE}.revenue)*0.1) ;;
   }
-
+# #change it back to measure
   measure: revenue_sum {
     type: sum
-#     sql: ${TABLE}.revenue ;;
-#       value_format: "#,###.00"
-#     value_format: "[>=1000000]0.00,,\"M\";[>=1000]0.00,\"K\";0.00"
-#       html: {% if currency._parameter_value == "'USD'" %} ${{ rendered_value }}
-#           {% elsif currency._parameter_value == "'GBP'" %} £{{ rendered_value }}
-#           {% elsif currency._parameter_value == "'EUR'" %} €{{ rendered_value }}
-#           {% elsif currency._parameter_value == "'CAD'" %} C${{ rendered_value }}
-#           {% endif %};;
-      sql:
-        {% if currency._parameter_value == "'USD'" %} ${TABLE}.revenue
-        {% elsif currency._parameter_value == "'GBP'" %} ${TABLE}.revenue
-        {% elsif currency._parameter_value == "'EUR'" %} ${TABLE}.revenue
-        {% elsif currency._parameter_value == "'CAD'" %} ${TABLE}.revenue
-        {% endif %}
-      ;;
+    # type: number
+    sql: ${TABLE}.revenue ;;
+#     html:
+#     {% if value == null %}
+# <p style="color: white; background-color: black">{{ rendered_value }}</p>
+# {% else %}
+# <p style="color: white; background-color: black;>{{ rendered_value }}</p>
+# {% endif %} ;;
+
   }
+
 
   set: won_set {
     fields:[movies.ALL_FIELDS*]
@@ -433,14 +458,33 @@ measure: dummy_measure {
   sql: ${vote_count} ;;
 }
 
+  measure: new_count_measure {
+    type: count
+    drill_fields: [revenue_rank.revenue_rank, movies.title, movies.release_year, movies.movies_poster]
+  }
   measure: count_movies {
     type: count
 #     html: <p style="color:red;">{{ value }}</p> ;;
-    drill_fields: [revenue_rank.revenue_rank, movies.title, movies.release_year, movies.movies_poster]
+    # drill_fields: [revenue_rank.revenue_rank, movies.title, movies.release_year, movies.movies_poster]
     link: {
       label: "Drill Into Movies"
-      url: "{{ link }}&sorts=revenue_rank.revenue_rank"
+      url: "{{ new_count_measure._link }}&sorts=revenue_rank.revenue_rank"
     }
+}
+
+measure: 2016_count_movies{
+  type: count
+  filters: [release_year: "2016"]
+}
+
+measure: 2017_count_movies {
+  type: count
+  filters: [release_year: "2017"]
+}
+
+measure: 2016_2017_count_diff {
+  type: number
+  sql:  (${2017_count_movies}/NULLIF(${2016_count_movies},0))-1;;
 }
 
   measure: won_count {
@@ -449,6 +493,7 @@ measure: dummy_measure {
     #btn btn-primary btn-lg btn-block
 #     drill_fields: [detail*]
     drill_fields: [won_set*]
+    # filters: [release_date: "after today"]
 }
 
   measure: sum_popularity {
@@ -461,14 +506,24 @@ measure: dummy_measure {
     #   <a href="https://dcl.dev.looker.com/explore/won_thesis_movies/movies?fields=release_year,movies.movies_poster, movies.sum_popularity&f[genres.genre]={{ genres.genre._value }}&f[movies.release_year]={{ movies.release_year._value }}&f[imdb_ratings.num_votes]=>=5000&sorts=movies.sum_popularity desc"</a>
     # {% endif %} ;;
 
-    link: {
-      label: "Drill Into Movies"
-      url: "https://dcl.dev.looker.com/{{ _user_attributes['favorite_state'] }}?Genre={{ genres.genre._value | url_encode }}"
-      # url: "/dashboards/285?{{ 'Test%' | url_encode }}={{ 4 | url_encode }}"
+    # link: {
+    #   label: "Drill Into Movies"
+    #   url: "https://dcl.dev.looker.com/{{ _user_attributes['favorite_state'] }}?Genre={{ genres.genre._value | url_encode }}"
+    #   # url: "/dashboards/285?{{ 'Test%' | url_encode }}={{ 4 | url_encode }}"
 
-     }
+    # }
+    link: {
+      label: "won_drilling_test"
+      url: "https://dcl.dev.looker.com/dashboards-next/1053?Video(Yes/No)=Yes"
+
+    }
   }
 
+measure: list_test{
+  type: list
+  list_field: genres.genre
+  order_by_field: count_movies
+}
 measure: yesno {
   type: yesno
   sql: ${sum_popularity}>50 OR ${count_movies}>100  ;;
